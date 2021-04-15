@@ -17,11 +17,6 @@ namely deafult.js and server.js, which under the hood, runs these files
 These files setup the express server and the socket.io server and exposes them
 
 ///////////////////////////////////////////////////
-DOUBTS
-
-what are static files ??
-
-///////////////////////////////////////////////////
 JUMPING STONES
 
 Could not able to recreate the clamping of the camera to the player's position
