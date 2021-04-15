@@ -1,7 +1,7 @@
 // This is the file that deals with client socket
 
 // Getting the io variable
-const clientSocket = io();
+const clientSocket = io("http://127.0.0.1:3000/");
 
 // When the user actually starts the game, he calls the function init()
 const init = () => {
@@ -22,7 +22,7 @@ const init = () => {
         xVector: player.xVector,
         yVector: player.yVector,
       });
-    }, 500);
+    }, 100);
   });
 
   // The socket must also listen to the tock function, that contains
@@ -39,7 +39,7 @@ const init = () => {
 
     player.locX = tempPlayer.locX;
     player.locY = tempPlayer.locY;
-    // console.log(clientSocket.id, player.locX, player.locY);
+    player.score = tempPlayer.score;
   });
 
   // Listening for the orbreplacement arr and updating it accordingly
@@ -55,12 +55,27 @@ const init = () => {
 
   // Listening for the got killed message
   clientSocket.on("gotKilled", (msg) => {
-    console.log(msg);
+    messageSpan.style.opacity = 1;
+    messageScore.style.opacity = 1;
+    messageSpan.textContent = msg.msg;
+    messageScore.textContent = msg.score;
+    setTimeout(() => {
+      messageSpan.style.opacity = 0;
+      messageScore.style.opacity = 0;
+      retryButton.style.opacity = 1;
+    }, 5000);
+    retryButton.addEventListener("click", () => {
+      window.location.reload();
+    });
   });
 
   // Listening for the  killed message
   clientSocket.on("killed", (msg) => {
-    console.log(msg);
+    messageSpan.style.opacity = 1;
+    messageSpan.textContent = msg;
+    setTimeout(() => {
+      messageSpan.style.opacity = 0;
+    }, 3000);
   });
 
   // Listening for the updateLeaderboard event, and update the scores
@@ -68,5 +83,14 @@ const init = () => {
   clientSocket.on("updateLeaderboard", (newLeaderboard) => {
     leaderboard = newLeaderboard;
     console.log(leaderboard);
+  });
+
+  // Listening for the general event, where we display the message
+  clientSocket.on("generalMessage", (msg) => {
+    messageSpan.style.opacity = 1;
+    messageSpan.textContent = msg;
+    setTimeout(() => {
+      messageSpan.style.opacity = 0;
+    }, 3000);
   });
 };

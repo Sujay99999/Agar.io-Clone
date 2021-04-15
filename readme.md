@@ -18,5 +18,15 @@ These files setup the express server and the socket.io server and exposes them
 
 ///////////////////////////////////////////////////
 JUMPING STONES
+=> Could not able to recreate the clamping of the camera to the player's position
+=> Could not able to configure the AABB type collision detection
 
-Could not able to recreate the clamping of the camera to the player's position
+///////////////////////////////////////////////////
+POSSIBLE MODIFICATIONS
+=> If the browser is well supported and able to prcoess heavy tasks, then we can update the
+leaderboard every frame rather than updating it, when there is a collision
+=> Still not able to exactly get the collision detection correct. Sometimes, it gets all fuzzy
+
+///////////////////////////////////////////////////
+DOUBTS
+=> What is difference between the static files and views in node.js

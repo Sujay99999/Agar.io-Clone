@@ -1,15 +1,8 @@
 // This file contains all the data about the canvas
 
-// context.beginPath();
-// context.lineWidth = 2;
-// context.strokeStyle = "#FF0000";
-// context.strokeRect(0, 0, canvas.width, canvas.height);
-// context.fillRect(0, 0, canvas.width, canvas.height);
-
 // This function is called for every frame, and if the coordinates of the circle change
 // then the circle starts to move
 const draw = () => {
-  // console.log("draw fn", Date.now());
   // To draw the players circle in the canvas
 
   // Reseting the translate to default
@@ -25,7 +18,6 @@ const draw = () => {
   context.translate(camX, camY);
 
   // Render all the players with their updated positions
-
   allPlayers.forEach((playerEl) => {
     // The beginPath() method begins a path, or resets the current path.
     context.beginPath();
@@ -40,6 +32,19 @@ const draw = () => {
     context.strokeStyle = "#fff";
     context.stroke();
   });
+
+  // Updating leaderboard and score board
+  scoreSpan.textContent = player.score;
+  let html = "";
+  leaderboard.forEach((playerEl) => {
+    html += `
+    <li class="leaderboard__player">
+    <span class="leaderboard__player__name">${playerEl.name}</span>
+      <span class="leaderboard__player__score">${playerEl.score}</span>
+      </li>
+    `;
+  });
+  leaderboardList.innerHTML = html;
 
   // Render all the orbs from the orbArr
   orbArr.forEach((orb) => {

@@ -27,11 +27,12 @@ const checkForOrbCollisions = (pInfo, pOtherInfo, orbArr, settings) => {
             pOtherInfo.zoom -= 0.001;
           }
           pInfo.radius += 0.25;
-          if (pOtherInfo.speed < -0.005) {
-            pOtherInfo.speed += 0.005;
-          } else if (pOtherInfo.speed > 0.005) {
-            pOtherInfo.speed -= 0.005;
+          if (pOtherInfo.speed < -0.01) {
+            pOtherInfo.speed += 0.01;
+          } else if (pOtherInfo.speed > 0.01) {
+            pOtherInfo.speed -= 0.01;
           }
+          // console.log("new speed is " + pOtherInfo.speed);
           // we have to keep orbArr updated for new players
           // we just dont want to push them out more than we have to
 

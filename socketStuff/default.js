@@ -25,10 +25,10 @@ const settings = {
   defaultRadius: 10,
   defaultSpeed: 15,
   defaultZoom: 10,
-  defaultOrbs: 500,
+  defaultOrbs: 100,
   canvasWidth: 500,
   canvasHeight: 500,
-  tickTime: 500,
+  tickTime: 100,
 };
 
 // This function is called, when the server is initialized
@@ -88,6 +88,7 @@ io.on("connection", (socket) => {
     // This listener captures the new vector of the particular player
     // and updates the coordinates respectively
     socket.on("tick", (data) => {
+      // console.log(players);
       // The data contains the player's new vector position, and here, wee need to
       // update the players coordinates
 
@@ -208,7 +209,6 @@ io.on("connection", (socket) => {
           // In case of collision between player and player, we must send a message
           // to all connected players except the killed player,
           // that the player has been terminated.
-
           socket
             .to("room")
             .emit(
@@ -241,6 +241,27 @@ io.on("connection", (socket) => {
           );
         })
         .catch((err) => console.error(err));
+    });
+
+    // Listen for the disconnecting event
+    socket.on("disconnecting", (reason) => {
+      socket.leave("room");
+
+      const disconnectedSocket = players.find((playerEl) => {
+        return (playerEl.socketId = socket.id);
+      });
+      const disconnectedSocketIndex = players.findIndex((playerEl) => {
+        return (playerEl.socketId = socket.id);
+      });
+
+      // Correspondingly change the players arr
+      players.splice(disconnectedSocketIndex, 1);
+
+      // Emit an message to all the connected players
+      io.to("room").emit(
+        "generalMessage",
+        `The player ${disconnectedSocket.name} has been disconnected, ${reason}`
+      );
     });
   });
 });
