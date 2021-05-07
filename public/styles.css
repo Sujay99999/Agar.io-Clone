@@ -10,11 +10,19 @@ html {
   font-size: 62.5%;
 }
 
+html,
 body {
   background-color: black;
   overflow: hidden;
 
   position: relative;
+  margin: 0;
+  height: 100%;
+}
+
+.container {
+  height: inherit;
+  width: inherit;
 }
 
 canvas {

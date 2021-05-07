@@ -20,6 +20,7 @@ These files setup the express server and the socket.io server and exposes them
 JUMPING STONES
 => Could not able to recreate the clamping of the camera to the player's position
 => Could not able to configure the AABB type collision detection
+=> Need to reasearch a lot for clubbing multiple social oauth providers to maintain a efficient DB
 
 ///////////////////////////////////////////////////
 POSSIBLE MODIFICATIONS

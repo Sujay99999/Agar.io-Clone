@@ -1,0 +1,27 @@
+extends layout 
+  
+block content
+  //- the res.local is named as currentPlayer
+  canvas#canvas(style="background: url('images/starfield.jpg')" )
+    // JS will be used here
+  .score__wrapper
+    div
+      | Score: 
+      span.score
+  .leaderboard__wrapper
+    .leaderboard
+      span.text-center Leaders:
+      ol.leaderboard__list
+          //- <li class="leaderboard__player">
+          //- <span class="leaderboard__player__name">Sujay</span>
+          //- <span class="leaderboard__player__score">1</span>
+          //- </li>
+  .message__wrapper
+    .message asasa
+    span.message__score 12
+  .retry-btn__wrapper
+    button.retry-btn RETRY AGAIN....
+
+block scripts 
+  //- this js file is responsible for starting the whole game 
+  script(src='/js/UIStuffBundle.js')
