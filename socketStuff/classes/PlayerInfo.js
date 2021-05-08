@@ -2,9 +2,10 @@
 // clients as well and the server
 
 class PlayerInfo {
-  constructor(playerName, socketId, settings) {
+  constructor(playerDetails, socketId, settings) {
     this.socketId = socketId;
-    this.name = playerName;
+    this.databaseUserId = playerDetails.id || "anonymous";
+    this.name = playerDetails.name;
     this.color = this.getRandomColor();
     this.locX = Math.floor(Math.random() * settings.canvasWidth);
     this.locY = Math.floor(Math.random() * settings.canvasHeight);

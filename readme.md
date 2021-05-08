@@ -27,6 +27,8 @@ POSSIBLE MODIFICATIONS
 => If the browser is well supported and able to prcoess heavy tasks, then we can update the
 leaderboard every frame rather than updating it, when there is a collision
 => Still not able to exactly get the collision detection correct. Sometimes, it gets all fuzzy
+=> As we are using the JWT for authentication, there is possibility that a single user can play through multiple accounts.
+We need to restrict him.
 
 ///////////////////////////////////////////////////
 DOUBTS

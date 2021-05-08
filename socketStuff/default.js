@@ -15,6 +15,7 @@ const checkForOrbCollisions = require("./checkCollisions.js")
 const checkForPlayerCollisions = require("./checkCollisions.js")
   .checkForPlayerCollisions;
 
+// Global classes for the server
 // Importing the classes
 // This class contains the whole details of the player -- Only stored on the server
 const PlayerTotalInfo = require("./classes/PlayerTotalInfo.js");
@@ -32,7 +33,7 @@ const settings = {
   defaultOrbs: 100,
   canvasWidth: 500,
   canvasHeight: 500,
-  tickTime: 100,
+  tickTime: 2000,
 };
 
 // This function is called, when the server is initialized
@@ -50,7 +51,6 @@ module.exports.initGame = () => {
 // When we see a client starts to play the game, the client must have access
 // to certain information
 // The server must contain information about the player and all the players
-
 module.exports.initSocketListners = async () => {
   console.log("the socket listners on the server side has been initialized");
   io.of("/game").use(async (socket, next) => {
@@ -69,11 +69,24 @@ module.exports.initSocketListners = async () => {
           socket.request.headers.cookie.split("=")[1]
         );
         if (response instanceof AppError) {
-          next(response);
+          console.log(
+            "didnt allow to user to connect, as his details were wrong"
+          );
+          return next(response);
         }
-        console.log(response);
-        socket.user = response;
+        console.log("response is", response);
 
+        // If the user with the token is already playing, we must restrict him
+        // We must loop through the players arr, and filter them out
+        const doubleRolePlayer = players.find((player) => {
+          return player.databaseUserId === response.id;
+        });
+        if (doubleRolePlayer) {
+          console.log("NO CHEATING MFF");
+          return next(new AppError("NO CHEATING MFF", 401));
+        }
+
+        socket.user = response;
         return next();
       } else if (
         socket.handshake.query.name &&
@@ -86,13 +99,15 @@ module.exports.initSocketListners = async () => {
         // Or else, return a error
         console.log("query param fn called");
         socket.user = {
+          id: "anonymous",
+          provider: "local",
           name: socket.handshake.query.name,
         };
         return next();
       }
       // next(new AppError(404, "You are not allowed to access the route"));
       console.log("noe cookie present or query param");
-      next(new AppError(404, "no cookie present or query param"));
+      next(new AppError("no cookie present or query param", 404));
     } catch (error) {
       console.log("auth error catcher", error);
       next(error);
@@ -102,8 +117,7 @@ module.exports.initSocketListners = async () => {
     // console.log(io);
     console.log("the socket is connected", socket.id);
     console.log("the socket name is " + socket.user.name);
-    // Even though the client gets connected to server, the details are not shared until
-    // the player starts the game
+    // Even though the client gets connected to server, there is a initial round of message exchange
 
     // This player object contains the details of the cooresponding socket that is connected
     let connectedPlayerTotalInfo = {};
@@ -116,7 +130,7 @@ module.exports.initSocketListners = async () => {
     // and ONLY send some data back to the client
     socket.on("initEvent", (data) => {
       // console.log(data);
-      const playerInfo = new PlayerInfo(socket.user.name, data.id, settings);
+      const playerInfo = new PlayerInfo(socket.user, data.id, settings);
       const playerOtherInfo = new PlayerOtherInfo(settings);
       connectedPlayerTotalInfo = new PlayerTotalInfo(
         data.id,
@@ -124,6 +138,7 @@ module.exports.initSocketListners = async () => {
         playerOtherInfo
       );
       players.push(playerInfo);
+      console.log(players);
 
       // This is sent as a response
       socket.emit("initReturn", {
@@ -135,15 +150,15 @@ module.exports.initSocketListners = async () => {
       // that is required by all the client to render all the players
       // and their updated locations, size and score
       // console.log("player data on server is", players);
-
       setInterval(function () {
-        // console.log("player data that is sent to client", players);
-        io.to("room").emit("tock", players);
+        console.log("player data that is sent to client");
+        io.of("/game").to("room").emit("tock", players);
       }, settings.tickTime);
 
       // This listener captures the new vector of the particular player
       // and updates the coordinates respectively
       socket.on("tick", (data) => {
+        // console.log("tick data");
         // The data contains the player's new vector position, and here, wee need to
         // update the players coordinates
 
@@ -191,7 +206,10 @@ module.exports.initSocketListners = async () => {
           connectedPlayerTotalInfo.playerInfo.locX += speed * data.xVector;
           connectedPlayerTotalInfo.playerInfo.locY -= speed * data.yVector;
         }
-        // console.log(connectedPlayerTotalInfo);
+        console.log(
+          connectedPlayerTotalInfo.playerInfo.locX,
+          connectedPlayerTotalInfo.playerInfo.locY
+        );
 
         // Checking for the collision, and if there is any, we correspondingly update
         // the players array
@@ -214,7 +232,7 @@ module.exports.initSocketListners = async () => {
 
             // When there is actually a collision with an orb, we need to update the
             // orbArr and also the updated arr to all the clients
-            io.to("room").emit("orbReplacement", {
+            io.of("/game").to("room").emit("orbReplacement", {
               consumedOrbIndex,
               orbArr,
             });
@@ -222,20 +240,22 @@ module.exports.initSocketListners = async () => {
             // Its not necessary to update the leaderboard every frame, instead, we can
             // just update it when the player's stats are changed. i.e when orb is
             // consumed
-            io.to("room").emit(
-              "updateLeaderboard",
-              // It's an array of scores of all the players
-              players
-                .map((playerInfo) => {
-                  return {
-                    name: playerInfo.name,
-                    score: playerInfo.score,
-                  };
-                })
-                .sort((a, b) => {
-                  return b.score > a.score;
-                })
-            );
+            io.of("/game")
+              .to("room")
+              .emit(
+                "updateLeaderboard",
+                // It's an array of scores of all the players
+                players
+                  .map((playerInfo) => {
+                    return {
+                      name: playerInfo.name,
+                      score: playerInfo.score,
+                    };
+                  })
+                  .sort((a, b) => {
+                    return b.score > a.score;
+                  })
+              );
           })
           .catch((err) => {
             // console.error(err);
@@ -252,9 +272,9 @@ module.exports.initSocketListners = async () => {
             // NOTE: This function is only called by the killer socket
 
             // Firstly, findout the died socket and remove him from the room
-            const diedSocket = io.sockets.sockets.get(
-              updatedScores.died.socketId
-            );
+            const diedSocket = io
+              .of("/game")
+              .sockets.sockets.get(updatedScores.died.socketId);
 
             // And also send a message to the killed player, that he is terminated
             // and the socket is also removed from the room.
@@ -283,20 +303,23 @@ module.exports.initSocketListners = async () => {
             // Its not necessary to update the leaderboard every frame, instead, we can
             // just update it when the player's stats are changed. i.e when orb is
             // consumed
-            io.to("room").emit(
-              "updateLeaderboard",
-              // It's an array of scores of all the players
-              players
-                .map((playerInfo) => {
-                  return {
-                    name: playerInfo.name,
-                    score: playerInfo.score,
-                  };
-                })
-                .sort((a, b) => {
-                  return b.score > a.score;
-                })
-            );
+            io.of("/game")
+              .of("/game")
+              .to("room")
+              .emit(
+                "updateLeaderboard",
+                // It's an array of scores of all the players
+                players
+                  .map((playerInfo) => {
+                    return {
+                      name: playerInfo.name,
+                      score: playerInfo.score,
+                    };
+                  })
+                  .sort((a, b) => {
+                    return b.score > a.score;
+                  })
+              );
           })
           .catch((err) => {
             console.error(err);
@@ -321,10 +344,12 @@ module.exports.initSocketListners = async () => {
         players.splice(disconnectedSocketIndex, 1);
         // console.log("after slicing", players);
         // Emit an message to all the connected players
-        io.to("room").emit(
-          "generalMessage",
-          `The player ${disconnectedSocket.name} has been disconnected, ${reason}`
-        );
+        io.of("/game")
+          .to("room")
+          .emit(
+            "generalMessage",
+            `The player ${disconnectedSocket.name} has been disconnected, ${reason}`
+          );
       });
     });
   });

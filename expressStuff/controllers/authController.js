@@ -8,10 +8,11 @@ module.exports.sendCookie = (req, res, next) => {
   // Here the data of the user, is present in the req.user
 
   // Here, we must encode the mongodb id of the user rather than using the google id
-  const jwtToken = jwt.sign(
-    { id: req.user.id, provider: req.user.provider },
-    process.env.JWT_SECRET
+  console.log(
+    "the user obyained from the verify callback functio is",
+    req.user
   );
+  const jwtToken = jwt.sign(req.user._id, process.env.JWT_SECRET);
   res.cookie("jwtCookie", jwtToken, {
     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRY_TIME),
     httpOnly: true,
@@ -22,7 +23,7 @@ module.exports.sendCookie = (req, res, next) => {
 
 module.exports.redirectGame = (req, res, next) => {
   // Here, we need to redirect to the game page, so that the authenticated user can now start the game
-  console.log(req.user.id, "from redirectGame middlware");
+  console.log(req.user._id, "from redirectGame middlware");
   res.redirect("/game");
 };
 
@@ -40,10 +41,12 @@ module.exports.verifyCookieToken = async (token) => {
     // NOTE: Here, we must verify the payload and get the user from the db and then only pass onto the next middleware
     // For now, the user obj attached is
     return {
+      id: decodedPayload.id,
+      provider: decodedPayload.provider,
       name: "sumedha",
     };
   } catch (error) {
-    return new AppError(404, "Unable to verify the user using the cookie");
+    return new AppError("Unable to verify the user using the cookie", 401);
   }
 };
 

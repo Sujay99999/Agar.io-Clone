@@ -13,10 +13,10 @@ import "regenerator-runtime/runtime";
 const basicForm = document.getElementById("login-form-basic");
 const anonymousForm = document.getElementById("login-form-anonymous");
 const googleBtn = document.getElementById("login-btn-google");
-const basicFormBtn = document.getElementById("login-form-basic-button");
+//const basicFormBtn = document.getElementById("login-form-basic-button");
 const anonymousFormBtn = document.getElementById("login-form-anonymous-button");
-const basicFormEmail = document.getElementById("login-form-basic-email");
-const basicFormPassword = document.getElementById("login-form-basic-password");
+//const basicFormEmail = document.getElementById("login-form-basic-email");
+//const basicFormPassword = document.getElementById("login-form-basic-password");
 const anonymousFormName = document.getElementById("login-form-anonymous-name");
 
 // auth using google
@@ -27,20 +27,20 @@ googleBtn.addEventListener("click", (event) => {
 
 // auth using form
 // 1) Get the details from the form and redirect to the game page
-basicForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
+// basicForm.addEventListener("submit", async (event) => {
+//   event.preventDefault();
 
-  const email = basicFormEmail.value;
-  const password = basicFormPassword.value;
-  const response = await axios({
-    method: "post",
-    url: "/game",
-    data: {
-      email: email,
-      password: password,
-    },
-  });
-});
+//   const email = basicFormEmail.value;
+//   const password = basicFormPassword.value;
+//   const response = await axios({
+//     method: "post",
+//     url: "/game",
+//     data: {
+//       email: email,
+//       password: password,
+//     },
+//   });
+// });
 
 // auth anonymously
 // 1) Get the name form the form. and and hit the /login-anonymous

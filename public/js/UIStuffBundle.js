@@ -9118,21 +9118,17 @@ console.log("socketstuff loaded"); // imports
 // Getting the io variable
 console.log("".concat(location.protocol, "//").concat(location.host));
 var clientSocket = (0, _socket.io)(location.href);
-console.log("clientsocket is", clientSocket);
-
-var getCookies = function getCookies() {
-  var pairs = document.cookie.split(";");
-  var cookies = {};
-
-  for (var i = 0; i < pairs.length; i++) {
-    var pair = pairs[i].split("=");
-    cookies[(pair[0] + "").trim()] = unescape(pair.slice(1).join("="));
-  }
-
-  return cookies;
-};
-
-console.log(getCookies()); // When the user actually starts the game, he calls the function init()
+console.log("clientsocket is", clientSocket); // const getCookies = function () {
+//   var pairs = document.cookie.split(";");
+//   var cookies = {};
+//   for (var i = 0; i < pairs.length; i++) {
+//     var pair = pairs[i].split("=");
+//     cookies[(pair[0] + "").trim()] = unescape(pair.slice(1).join("="));
+//   }
+//   return cookies;
+// };
+// console.log(getCookies());
+// When the user actually starts the game, he calls the function init()
 
 var init = function init(globalObj, domElements, canvasObj) {
   // The draw is an recursive fn that starts drwaing the canvas
@@ -9153,22 +9149,25 @@ var init = function init(globalObj, domElements, canvasObj) {
   // This inturn emits a tick event
 
   clientSocket.on("initReturn", function (msg) {
-    console.log(msg);
+    console.log("the initReturn msg is with orbArr adn the usrename ", msg);
     globalObj.currPlayer.name = msg.userName;
     globalObj.orbArr = msg.orbArr;
     setTimeout(function () {
+      console.log("started transmitting data to the server");
       setInterval(function () {
+        console.log("data is sent to the server", globalObj.currPlayer.xVector, globalObj.currPlayer.yVector);
         clientSocket.emit("tick", {
           id: clientSocket.id,
           xVector: globalObj.currPlayer.xVector,
           yVector: globalObj.currPlayer.yVector
         });
-      }, 100);
+      }, 2000);
     }, 1000);
   }); // The socket must also listen to the tock function, that contains
   // the newly fetched coordinates of the items in canvas
 
   clientSocket.on("tock", function (tockData) {
+    console.log("data recieved from the server");
     globalObj.allPlayers = tockData; // console.log("allPLayers", globalObj.allPlayers);
 
     var tempPlayer = globalObj.allPlayers.find(function (playerEl) {

@@ -14087,11 +14087,11 @@ console.log("initStuff loaded"); // Other modules
 // DOM elements
 var basicForm = document.getElementById("login-form-basic");
 var anonymousForm = document.getElementById("login-form-anonymous");
-var googleBtn = document.getElementById("login-btn-google");
-var basicFormBtn = document.getElementById("login-form-basic-button");
-var anonymousFormBtn = document.getElementById("login-form-anonymous-button");
-var basicFormEmail = document.getElementById("login-form-basic-email");
-var basicFormPassword = document.getElementById("login-form-basic-password");
+var googleBtn = document.getElementById("login-btn-google"); //const basicFormBtn = document.getElementById("login-form-basic-button");
+
+var anonymousFormBtn = document.getElementById("login-form-anonymous-button"); //const basicFormEmail = document.getElementById("login-form-basic-email");
+//const basicFormPassword = document.getElementById("login-form-basic-password");
+
 var anonymousFormName = document.getElementById("login-form-anonymous-name"); // auth using google
 // 1) directly hit the google route
 
@@ -14099,24 +14099,38 @@ googleBtn.addEventListener("click", function (event) {
   window.location.assign("/auth/google");
 }); // auth using form
 // 1) Get the details from the form and redirect to the game page
+// basicForm.addEventListener("submit", async (event) => {
+//   event.preventDefault();
+//   const email = basicFormEmail.value;
+//   const password = basicFormPassword.value;
+//   const response = await axios({
+//     method: "post",
+//     url: "/game",
+//     data: {
+//       email: email,
+//       password: password,
+//     },
+//   });
+// });
+// auth anonymously
+// 1) Get the name form the form. and and hit the /login-anonymous
 
-basicForm.addEventListener("submit", /*#__PURE__*/function () {
+anonymousForm.addEventListener("submit", /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(event) {
-    var email, password, response;
+    var name, response;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
             event.preventDefault();
-            email = basicFormEmail.value;
-            password = basicFormPassword.value;
+            name = anonymousFormName.value;
+            console.log(name);
             _context.next = 5;
             return (0, _axios.default)({
               method: "post",
-              url: "/game",
+              url: "/login-anonymous",
               data: {
-                email: email,
-                password: password
+                name: name
               }
             });
 
@@ -14133,42 +14147,6 @@ basicForm.addEventListener("submit", /*#__PURE__*/function () {
 
   return function (_x) {
     return _ref.apply(this, arguments);
-  };
-}()); // auth anonymously
-// 1) Get the name form the form. and and hit the /login-anonymous
-
-anonymousForm.addEventListener("submit", /*#__PURE__*/function () {
-  var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(event) {
-    var name, response;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            event.preventDefault();
-            name = anonymousFormName.value;
-            console.log(name);
-            _context2.next = 5;
-            return (0, _axios.default)({
-              method: "post",
-              url: "/login-anonymous",
-              data: {
-                name: name
-              }
-            });
-
-          case 5:
-            response = _context2.sent;
-
-          case 6:
-          case "end":
-            return _context2.stop();
-        }
-      }
-    }, _callee2);
-  }));
-
-  return function (_x2) {
-    return _ref2.apply(this, arguments);
   };
 }());
 },{"axios":"../../node_modules/axios/index.js","core-js/stable":"../../node_modules/core-js/stable/index.js","regenerator-runtime/runtime":"../../node_modules/regenerator-runtime/runtime.js"}],"../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
@@ -14199,7 +14177,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52662" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63695" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

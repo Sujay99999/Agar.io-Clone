@@ -20,3 +20,11 @@ process.on("unhandledRejection", (error) => {
     process.exit(1);
   });
 });
+
+// Handling Sigterm signals
+process.on("SIGTERM", () => {
+  console.log("SIGTERM recieved");
+  server.close(() => {
+    console.log("Terminating the application");
+  });
+});

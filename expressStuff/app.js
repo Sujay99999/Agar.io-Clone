@@ -28,10 +28,29 @@ socketStuff.initGame();
 socketStuff.initSocketListners();
 
 // Main route
-app.get("/", (req, res) => {
-  // 1) render the init page. this page has a very small load on the js and doesnt load the heavy scripts
-  res.render("initTemplate");
-});
+app.get(
+  "/",
+  (req, res, next) => {
+    // this middleware is used to check for the presence of the token and if the user is authenticated he is
+    // redirected to the game directly
+    if (!req.cookies || !req.cookies["jwtCookie"]) {
+      // As there is no cookie, pass onto the next middleware
+      return next();
+    }
+    const response = authController.verifyCookieToken(req.cookies["jwtCookie"]);
+    if (response instanceof AppError) {
+      return next();
+    }
+    res.redirect("/game");
+  },
+  (req, res) => {
+    console.log(
+      "There is no cookie found. Waiting for the user to wither login with google or play anonmously"
+    );
+    // 1) render the init page. this page has a very small load on the js and doesnt load the heavy scripts
+    res.render("initTemplate");
+  }
+);
 
 // For login purposes
 app.use("/auth", authRouter);
