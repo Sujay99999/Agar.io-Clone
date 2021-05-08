@@ -20,8 +20,8 @@ passport.use(
         const user = await User.findOne({ googleId: profile.id });
 
         if (user) {
-          console.log("this is a old user");
-          cb(null, user);
+          console.log("this is a old user", user);
+          return cb(null, user);
         }
         // create a new user based on the details
         const newUser = await User.create({
@@ -29,8 +29,8 @@ passport.use(
           googleId: profile.id,
           avatar: profile.photos[0].value,
         });
-        console.log("this is a new user");
-        cb(null, newUser);
+        console.log("this is a new user", newUser);
+        return cb(null, newUser);
       } catch (error) {
         console.error(error);
       }

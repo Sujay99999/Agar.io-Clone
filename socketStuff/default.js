@@ -33,7 +33,7 @@ const settings = {
   defaultOrbs: 100,
   canvasWidth: 500,
   canvasHeight: 500,
-  tickTime: 2000,
+  tickTime: 100,
 };
 
 // This function is called, when the server is initialized
@@ -55,10 +55,27 @@ module.exports.initSocketListners = async () => {
   console.log("the socket listners on the server side has been initialized");
   io.of("/game").use(async (socket, next) => {
     try {
+      // NOTE: We must give high priority for anonymous user rather than authenticating him using cookie
       // Here, we need to authenticate the user based on
       // 1) Cookie if present
 
       if (
+        socket.handshake.query.name &&
+        socket.handshake.query.name.length > 0
+      ) {
+        // If the user is not able to authenticate himself, atleast he can play the basic version, by taking the
+        // name from the query string
+
+        // 2) Query parameter if present
+        // Or else, return a error
+        console.log("query param fn called");
+        socket.user = {
+          id: "anonymous",
+          provider: "local",
+          name: socket.handshake.query.name,
+        };
+        return next();
+      } else if (
         socket.request.headers.cookie &&
         socket.request.headers.cookie.split("=")[0] === "jwtCookie"
       ) {
@@ -79,7 +96,7 @@ module.exports.initSocketListners = async () => {
         // If the user with the token is already playing, we must restrict him
         // We must loop through the players arr, and filter them out
         const doubleRolePlayer = players.find((player) => {
-          return player.databaseUserId === response.id;
+          return player.databaseUserId === response._id;
         });
         if (doubleRolePlayer) {
           console.log("NO CHEATING MFF");
@@ -87,22 +104,6 @@ module.exports.initSocketListners = async () => {
         }
 
         socket.user = response;
-        return next();
-      } else if (
-        socket.handshake.query.name &&
-        socket.handshake.query.name.length > 0
-      ) {
-        // If the user is not able to authenticate himself, atleast he can play the basic version, by taking the
-        // name from the query string
-
-        // 2) Query parameter if present
-        // Or else, return a error
-        console.log("query param fn called");
-        socket.user = {
-          id: "anonymous",
-          provider: "local",
-          name: socket.handshake.query.name,
-        };
         return next();
       }
       // next(new AppError(404, "You are not allowed to access the route"));
@@ -151,7 +152,7 @@ module.exports.initSocketListners = async () => {
       // and their updated locations, size and score
       // console.log("player data on server is", players);
       setInterval(function () {
-        console.log("player data that is sent to client");
+        // console.log("player data that is sent to client");
         io.of("/game").to("room").emit("tock", players);
       }, settings.tickTime);
 
@@ -228,6 +229,7 @@ module.exports.initSocketListners = async () => {
         );
         orbPlayerCollisionPromise
           .then((consumedOrbIndex) => {
+            // console.log("there is a orb collision");
             // console.log(consumedOrbIndex);
 
             // When there is actually a collision with an orb, we need to update the
@@ -270,6 +272,7 @@ module.exports.initSocketListners = async () => {
         playerPlayerCollisionPromise
           .then((updatedScores) => {
             // NOTE: This function is only called by the killer socket
+            console.log("there is a player-player collsion");
 
             // Firstly, findout the died socket and remove him from the room
             const diedSocket = io
@@ -288,6 +291,7 @@ module.exports.initSocketListners = async () => {
             // to all connected players except the killed player,
             // that the player has been terminated.
             socket
+              .of("/game")
               .to("room")
               .emit(
                 "playerReplacement",
@@ -304,7 +308,6 @@ module.exports.initSocketListners = async () => {
             // just update it when the player's stats are changed. i.e when orb is
             // consumed
             io.of("/game")
-              .of("/game")
               .to("room")
               .emit(
                 "updateLeaderboard",
@@ -335,6 +338,7 @@ module.exports.initSocketListners = async () => {
           return playerEl.socketId === socket.id;
         });
         console.log(disconnectedSocket);
+        if (!disconnectedSocket) return;
         // console.log("the disconnected socket is", disconnectedSocket.name);
         const disconnectedSocketIndex = players.findIndex((playerEl) => {
           return playerEl.socketId === socket.id;

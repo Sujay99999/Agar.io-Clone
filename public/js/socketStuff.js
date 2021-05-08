@@ -26,24 +26,31 @@ export const init = (globalObj, domElements, canvasObj) => {
   canvasStuff.draw(globalObj, domElements, canvasObj);
   canvasStuff.mouseListner(globalObj, domElements, canvasObj);
 
-  // The init event marks the actual start of the game and starts
-  // change of messages to the server
-  clientSocket.emit("initEvent", {
-    id: clientSocket.id,
-  });
-
   // Error handlers
-
   clientSocket.on("connect_error", (err) => {
     console.log("connect_error handler", err); // not authorized
   });
 
   clientSocket.on("disconnect", (reason) => {
     console.log("disconnect handler", reason);
+    setTimeout(() => {
+      domElements.retryButton.addEventListener("click", () => {
+        window.location.reload();
+      });
+    }, 3000);
   });
 
+  // The init event marks the actual start of the game and starts
+  // change of messages to the server
+  setTimeout(() => {
+    console.log(clientSocket.id);
+    clientSocket.emit("initEvent", {
+      id: clientSocket.id,
+    });
+  }, 1000);
   // Then the client must listen for an event named Initreturn
   // This inturn emits a tick event
+  // This has a delay of 1sec to maintain the smoothness
   clientSocket.on("initReturn", (msg) => {
     console.log("the initReturn msg is with orbArr adn the usrename ", msg);
     globalObj.currPlayer.name = msg.userName;
@@ -61,7 +68,7 @@ export const init = (globalObj, domElements, canvasObj) => {
           xVector: globalObj.currPlayer.xVector,
           yVector: globalObj.currPlayer.yVector,
         });
-      }, 2000);
+      }, 100);
     }, 1000);
   });
 

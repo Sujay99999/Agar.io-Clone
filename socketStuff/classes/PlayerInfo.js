@@ -4,7 +4,8 @@
 class PlayerInfo {
   constructor(playerDetails, socketId, settings) {
     this.socketId = socketId;
-    this.databaseUserId = playerDetails.id || "anonymous";
+    this.databaseUserId = playerDetails._id || "anonymous";
+    this.avatar = playerDetails.avatar || "defaultAvatar.jpg";
     this.name = playerDetails.name;
     this.color = this.getRandomColor();
     this.locX = Math.floor(Math.random() * settings.canvasWidth);
