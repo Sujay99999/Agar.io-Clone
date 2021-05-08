@@ -10,7 +10,7 @@ import "core-js/stable";
 import "regenerator-runtime/runtime";
 
 // DOM elements
-const basicForm = document.getElementById("login-form-basic");
+// const basicForm = document.getElementById("login-form-basic");
 const anonymousForm = document.getElementById("login-form-anonymous");
 const googleBtn = document.getElementById("login-btn-google");
 //const basicFormBtn = document.getElementById("login-form-basic-button");
@@ -50,14 +50,5 @@ anonymousForm.addEventListener("submit", async (event) => {
 
   const name = anonymousFormName.value;
   console.log(name);
-  const response = await axios({
-    method: "post",
-    url: "/login-anonymous",
-    data: {
-      name,
-    },
-  });
-  // if (response.data.status === "success") {
-  //   window.location.assign("http://127.0.0.1:3000/game");
-  // }
+  window.location.assign(`${location.href}game?name=${name}`);
 });

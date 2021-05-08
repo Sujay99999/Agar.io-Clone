@@ -1,26 +1,274 @@
 *,
-*::before,
-*::after {
+*::after,
+*::before {
   margin: 0;
   padding: 0;
+  -webkit-box-sizing: inherit;
+          box-sizing: inherit;
 }
 
 html {
-  box-sizing: border-box;
   font-size: 62.5%;
+  font-family: '.', monospace;
+  padding: 1rem;
 }
 
-html,
 body {
-  background-color: black;
-  overflow: hidden;
-
-  position: relative;
-  margin: 0;
-  height: 100%;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  background-color: #535353;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: calc(100vh - 2rem);
+  -webkit-transform: translateY(-3rem);
+          transform: translateY(-3rem);
 }
 
-.container {
+@media screen and (max-width: 500px) {
+  body {
+    -webkit-transform: translateY(-1rem);
+            transform: translateY(-1rem);
+  }
+}
+
+.title {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+}
+
+.title > h1 {
+  font-size: 4rem;
+  color: #7fff00;
+}
+
+.title > a {
+  padding-top: 2rem;
+  cursor: pointer;
+  border: none;
+  background-color: #535353;
+  height: -webkit-min-content;
+  height: -moz-min-content;
+  height: min-content;
+  width: -webkit-min-content;
+  width: -moz-min-content;
+  width: min-content;
+}
+
+@media screen and (max-width: 500px) {
+  .title > a {
+    padding: .5rem;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .title > a {
+    padding: .5rem;
+  }
+}
+
+.title > a:focus {
+  outline: none;
+}
+
+.title > a > img {
+  width: 20rem;
+  height: 5rem;
+}
+
+.title > a > img:hover {
+  -webkit-box-shadow: 1rem 1rem #000;
+          box-shadow: 1rem 1rem #000;
+  -webkit-transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in;
+}
+
+.title > a > img:active {
+  -webkit-box-shadow: 0.5rem 0.5rem;
+          box-shadow: 0.5rem 0.5rem;
+}
+
+span {
+  text-align: center;
+  font-size: 1.5rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin: 2rem auto;
+  color: #fff;
+}
+
+@media screen and (max-width: 500px) {
+  span {
+    margin: .5rem auto;
+  }
+}
+
+.form {
+  width: calc(100vw - 2rem);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.form form {
+  border: 0.5rem solid #7fff00;
+  background-color: #eeeeee;
+  padding: 2rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.form form label {
+  color: #000;
+  -webkit-transform: translateY(1rem);
+          transform: translateY(1rem);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.form form input {
+  width: 50vw;
+  height: 3rem;
+  border-radius: 0;
+}
+
+.form form input > * {
+  -webkit-transform: translateX(2px);
+          transform: translateX(2px);
+}
+
+.form form input::-webkit-input-placeholder {
+  -webkit-transform: translateX(2px);
+          transform: translateX(2px);
+}
+
+.form form input:-ms-input-placeholder {
+  transform: translateX(2px);
+}
+
+.form form input::-ms-input-placeholder {
+  transform: translateX(2px);
+}
+
+.form form input::placeholder {
+  -webkit-transform: translateX(2px);
+          transform: translateX(2px);
+}
+
+.form form input:focus {
+  border: 2px solid #000;
+  outline: none;
+}
+
+@media screen and (max-width: 500px) {
+  .form form input {
+    width: 75vw;
+  }
+}
+
+.form form a {
+  outline: none;
+  width: 13rem;
+  height: 2.25rem;
+  font-family: '.', monospace;
+  font-size: 1.1rem;
+  cursor: pointer;
+  background: #7fff00;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+}
+
+.form form button:focus {
+  outline: 2px solid #000;
+}
+
+.form form:hover {
+  -webkit-box-shadow: 1rem 1rem #000;
+          box-shadow: 1rem 1rem #000;
+  -webkit-transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in;
+}
+
+.instructions {
+  padding: 2rem 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  width: 100%;
+}
+
+.instructions-wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  width: 50vw;
+  padding-top: 3rem;
+}
+
+.instructions-wrapper > * {
+  color: #eeeeee;
+}
+
+.instructions-wrapper h2 {
+  font-size: 1.8rem;
+  padding-bottom: .5rem;
+}
+
+.instructions-wrapper ul li {
+  font-size: 1.5rem;
+}
+
+.instructions-wrapper ul li:not(:last-child) {
+  padding-bottom: 2px;
+}
+
+@media screen and (max-width: 500px) {
+  .instructions-wrapper {
+    width: 75vw;
+  }
+}
+/*# sourceMappingURL=style.css.map */
+
+container {
   height: inherit;
   width: inherit;
 }
@@ -95,49 +343,6 @@ canvas {
   display: none !important;
 }
 
-.modal {
-  padding: 1rem;
-
-  max-width: 100%;
-
-  background-color: #fff;
-
-  position: absolute;
-  left: 45%;
-  top: 40%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.modal__header {
-  padding: 1rem;
-  font-size: 2.5rem;
-  font-weight: bold;
-}
-
-.modal__form {
-  display: flex;
-  flex-direction: column;
-}
-
-input {
-  padding: 0.5rem;
-  margin: 2rem 1rem;
-}
-
-button {
-  border-radius: 5px;
-  font-size: 2.5rem;
-  margin: 1rem;
-  background-image: linear-gradient(
-    to right bottom,
-    rgb(57, 57, 190),
-    rgb(5, 250, 5)
-  );
-}
-
 .retry-btn {
   position: absolute;
   top: 40%;
@@ -145,160 +350,3 @@ button {
 
   opacity: 0;
 }
-
-/* .modal-sm {
-  min-width: 500px;
-  width: 30%;
-}
-
-.modal-content {
-  margin-top: 100px;
-  background-color: #ffffff;
-  border-radius: 10px;
-}
-
-.text-input {
-  font-size: 20px;
-  display: block;
-  margin: auto;
-  margin-bottom: 20px;
-  width: 90%;
-  padding: 5px;
-  border-radius: 5px;
-}
-
-.error-message {
-  font-size: 13px;
-  color: #e60000;
-}
-
-.play-button {
-  font-size: 20px;
-  display: block;
-  margin: 5px auto 5px;
-  width: 90%;
-  background-color: #00e6e6;
-  color: #ffffff;
-}
-
-#join-team-btn,
-#play-solo-btn,
-#create-team-btn,
-#create-play-solo-btn,
-#add-team-btn {
-  width: 48%;
-  margin: 5px auto 15px;
-  font-size: 18px;
-  display: inline-block;
-  background-color: #00e6e6;
-  color: #ffffff;
-}
-
-#create-team-btn,
-#add-team-btn,
-#join-team-btn {
-  background-color: #00e600;
-}
-
-.btn-github {
-  background-image: url("/images/GitHub-Mark-Light-32px.png") !important;
-  color: #fff;
-  background-color: #444;
-  border-color: rgba(0, 0, 0, 0.2);
-  background-repeat: no-repeat;
-  background-position: 5px;
-}
-.btn-github:hover {
-  color: rgba(200, 200, 200, 0.5);
-}
-
-.stats-btn {
-  width: 48%;
-  margin: 0 auto 15px;
-  font-size: 18px;
-  display: inline-block;
-  background-color: #e600e6;
-  color: #ffffff;
-}
-
-#create-button {
-  font-size: 20px;
-  display: block;
-  margin: 5px auto 5px;
-  width: 90%;
-  background-color: #00e600;
-  color: #ffffff;
-}
-
-#playerStats-all-btn,
-#playerStats-player-btn {
-  font-size: 20px;
-  display: block;
-  margin: 5px auto 5px;
-  width: 90%;
-  background-color: #e600e6;
-  color: #ffffff;
-}
-
-.stats-btn-wrapper,
-.play-btn-wrapper {
-  width: 90%;
-  margin: auto;
-}
-
-.btn-wrapper {
-  width: 90%;
-  margin: 20px auto;
-}
-
-.player-stats-btn,
-#join-team-btn,
-#create-team-btn,
-#add-team-btn {
-  float: left;
-}
-
-.all-stats-btn,
-#play-solo-btn,
-#create-play-solo-btn {
-  float: right;
-}
-
-.stats,
-.stat-number {
-  padding-top: 10px;
-  font-size: 20px;
-  width: 70%;
-  display: inline-block;
-}
-
-.stat-number {
-  width: 30%;
-  font-weight: bold;
-}
-
-.modal-footer {
-  clear: both;
-  text-align: left;
-}
-
-.player-stats {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.teams {
-  margin: 10px 0;
-}
-
-.join-button {
-  color: white;
-  background-color: #00e6e6;
-  margin-right: 10px;
-}
-
-.team {
-  font-size: 18px;
-}
-
- */
