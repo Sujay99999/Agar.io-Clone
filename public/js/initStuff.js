@@ -10,7 +10,7 @@ import "core-js/stable";
 import "regenerator-runtime/runtime";
 
 // DOM elements
-const basicForm = document.getElementById("login-form-basic");
+// const basicForm = document.getElementById("login-form-basic");
 const anonymousForm = document.getElementById("login-form-anonymous");
 const googleBtn = document.getElementById("login-btn-google");
 //const basicFormBtn = document.getElementById("login-form-basic-button");

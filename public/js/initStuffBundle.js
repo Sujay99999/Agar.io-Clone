@@ -14085,7 +14085,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 console.log("initStuff loaded"); // Other modules
 
 // DOM elements
-var basicForm = document.getElementById("login-form-basic");
+// const basicForm = document.getElementById("login-form-basic");
 var anonymousForm = document.getElementById("login-form-anonymous");
 var googleBtn = document.getElementById("login-btn-google"); //const basicFormBtn = document.getElementById("login-form-basic-button");
 
@@ -14117,7 +14117,7 @@ googleBtn.addEventListener("click", function (event) {
 
 anonymousForm.addEventListener("submit", /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(event) {
-    var name, response;
+    var name;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
@@ -14125,19 +14125,9 @@ anonymousForm.addEventListener("submit", /*#__PURE__*/function () {
             event.preventDefault();
             name = anonymousFormName.value;
             console.log(name);
-            _context.next = 5;
-            return (0, _axios.default)({
-              method: "post",
-              url: "/login-anonymous",
-              data: {
-                name: name
-              }
-            });
+            window.location.assign("".concat(location.href, "game?name=").concat(name));
 
-          case 5:
-            response = _context.sent;
-
-          case 6:
+          case 4:
           case "end":
             return _context.stop();
         }
@@ -14177,7 +14167,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "63695" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57526" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

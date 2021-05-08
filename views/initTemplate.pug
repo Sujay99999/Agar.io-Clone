@@ -1,21 +1,27 @@
 extends layout
 
 block content 
-  .modal
-    .modal__header PLAY AGAR.IO
-    .modal__login-google
-        button#login-btn-google Log in with google
-    //- .modal__login-basic
-    //-     p Log in with username and password
-    //-     form#login-form-basic.modal__form
-    //-       input#login-form-basic-email(type= 'email' name='login-form-basic-email')
-    //-       input#login-form-basic-password(type='password' name='login-form-basic-password')
-    //-       button#login-form-basic-button(type='submit') Login with credentials
-    .modal__login-anonymous
-      form#login-form-anonymous.modal__form
-        input#login-form-anonymous-name(type='text' name='login-form-anonymous-name' placeholder='Enter your Name')
-        p score wont be stored
-        button#login-form-anonymous-button(type='submit') PLAY ANONymously !
+  div
+  .title
+    h1 AGAR IO
+    a(href='http://127.0.0.1:9876/auth/google' id='login-btn-google')
+      img(src='images/google-login.png' alt='google-login-button')
+  span OR
+  .form
+    form(action='' id='login-form-anonymous')
+      label(for='name') Enter your name:
+      br
+      input#login-form-anonymous-name(type='text' name='name' placeholder='John Snow')
+      br
+      a(type='submit' id='login-form-anonymous-button') Play Anonymously
+  .instructions
+    .instructions-wrapper
+      h2
+        strong INSTRUCTIONS
+      ul
+        li Eat blobs smaller than you (duh). Every time you eat a blob, you get bigger in size.
+        li Smaller blobs move faster than larger blobs.
+        li Your score corresponds to the largest you have been in your current life.
 
 block scripts 
   script(src='/js/initStuffBundle.js')
