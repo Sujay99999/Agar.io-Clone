@@ -9133,20 +9133,29 @@ console.log("clientsocket is", clientSocket); // const getCookies = function () 
 var init = function init(globalObj, domElements, canvasObj) {
   // The draw is an recursive fn that starts drwaing the canvas
   canvasStuff.draw(globalObj, domElements, canvasObj);
-  canvasStuff.mouseListner(globalObj, domElements, canvasObj); // The init event marks the actual start of the game and starts
-  // change of messages to the server
-
-  clientSocket.emit("initEvent", {
-    id: clientSocket.id
-  }); // Error handlers
+  canvasStuff.mouseListner(globalObj, domElements, canvasObj); // Error handlers
 
   clientSocket.on("connect_error", function (err) {
     console.log("connect_error handler", err); // not authorized
   });
   clientSocket.on("disconnect", function (reason) {
     console.log("disconnect handler", reason);
-  }); // Then the client must listen for an event named Initreturn
+    setTimeout(function () {
+      domElements.retryButton.addEventListener("click", function () {
+        window.location.reload();
+      });
+    }, 3000);
+  }); // The init event marks the actual start of the game and starts
+  // change of messages to the server
+
+  setTimeout(function () {
+    console.log(clientSocket.id);
+    clientSocket.emit("initEvent", {
+      id: clientSocket.id
+    });
+  }, 1000); // Then the client must listen for an event named Initreturn
   // This inturn emits a tick event
+  // This has a delay of 1sec to maintain the smoothness
 
   clientSocket.on("initReturn", function (msg) {
     console.log("the initReturn msg is with orbArr adn the usrename ", msg);
@@ -9161,7 +9170,7 @@ var init = function init(globalObj, domElements, canvasObj) {
           xVector: globalObj.currPlayer.xVector,
           yVector: globalObj.currPlayer.yVector
         });
-      }, 2000);
+      }, 100);
     }, 1000);
   }); // The socket must also listen to the tock function, that contains
   // the newly fetched coordinates of the items in canvas
@@ -9324,7 +9333,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58851" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52912" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

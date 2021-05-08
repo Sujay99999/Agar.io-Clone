@@ -12,7 +12,15 @@ module.exports.sendCookie = (req, res, next) => {
     "the user obyained from the verify callback functio is",
     req.user
   );
-  const jwtToken = jwt.sign(req.user._id, process.env.JWT_SECRET);
+  console.log("payload is", {
+    _id: req.user._id,
+    name: req.user.name,
+    avatar: req.user.avatar,
+  });
+  const jwtToken = jwt.sign(
+    { _id: req.user._id, name: req.user.name, avatar: req.user.avatar },
+    process.env.JWT_SECRET
+  );
   res.cookie("jwtCookie", jwtToken, {
     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRY_TIME),
     httpOnly: true,
@@ -41,9 +49,9 @@ module.exports.verifyCookieToken = async (token) => {
     // NOTE: Here, we must verify the payload and get the user from the db and then only pass onto the next middleware
     // For now, the user obj attached is
     return {
-      id: decodedPayload.id,
-      provider: decodedPayload.provider,
-      name: "sumedha",
+      _id: decodedPayload._id,
+      name: decodedPayload.name,
+      avatar: decodedPayload.avatar,
     };
   } catch (error) {
     return new AppError("Unable to verify the user using the cookie", 401);

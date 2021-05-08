@@ -50,5 +50,6 @@ anonymousForm.addEventListener("submit", async (event) => {
 
   const name = anonymousFormName.value;
   console.log(name);
+
   window.location.assign(`${location.href}game?name=${name}`);
 });
