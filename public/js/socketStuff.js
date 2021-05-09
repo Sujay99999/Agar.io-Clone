@@ -5,20 +5,9 @@ import { io } from "socket.io-client";
 import * as canvasStuff from "./canvasStuff.js";
 
 // Getting the io variable
-console.log(`${location.protocol}//${location.host}`);
+console.log(location.href);
 const clientSocket = io(location.href);
 console.log("clientsocket is", clientSocket);
-
-// const getCookies = function () {
-//   var pairs = document.cookie.split(";");
-//   var cookies = {};
-//   for (var i = 0; i < pairs.length; i++) {
-//     var pair = pairs[i].split("=");
-//     cookies[(pair[0] + "").trim()] = unescape(pair.slice(1).join("="));
-//   }
-//   return cookies;
-// };
-// console.log(getCookies());
 
 // When the user actually starts the game, he calls the function init()
 export const init = (globalObj, domElements, canvasObj) => {
@@ -33,11 +22,15 @@ export const init = (globalObj, domElements, canvasObj) => {
 
   clientSocket.on("disconnect", (reason) => {
     console.log("disconnect handler", reason);
+    domElements.messageSpan.style.opacity = 1;
+    domElements.messageSpan.textContent = `Got Disconnected ${reason}. Please try again.`;
+
     setTimeout(() => {
+      domElements.retryButton.style.opacity = 1;
       domElements.retryButton.addEventListener("click", () => {
         window.location.reload();
       });
-    }, 3000);
+    }, 4000);
   });
 
   // The init event marks the actual start of the game and starts
@@ -56,28 +49,21 @@ export const init = (globalObj, domElements, canvasObj) => {
     globalObj.currPlayer.name = msg.userName;
     globalObj.orbArr = msg.orbArr;
     setTimeout(() => {
-      console.log("started transmitting data to the server");
+      // console.log("started transmitting data to the server");
       setInterval(function () {
-        console.log(
-          "data is sent to the server",
-          globalObj.currPlayer.xVector,
-          globalObj.currPlayer.yVector
-        );
         clientSocket.emit("tick", {
           id: clientSocket.id,
           xVector: globalObj.currPlayer.xVector,
           yVector: globalObj.currPlayer.yVector,
         });
-      }, 100);
+      }, 500);
     }, 1000);
   });
 
   // The socket must also listen to the tock function, that contains
   // the newly fetched coordinates of the items in canvas
   clientSocket.on("tock", (tockData) => {
-    console.log("data recieved from the server");
     globalObj.allPlayers = tockData;
-    // console.log("allPLayers", globalObj.allPlayers);
     const tempPlayer = globalObj.allPlayers.find((playerEl) => {
       return playerEl.socketId === clientSocket.id;
     });
@@ -92,7 +78,7 @@ export const init = (globalObj, domElements, canvasObj) => {
     globalObj.currPlayer.locX = tempPlayer.locX;
     globalObj.currPlayer.locY = tempPlayer.locY;
     globalObj.currPlayer.score = tempPlayer.score;
-    console.log("currplayer", globalObj.currPlayer);
+    // console.log("currplayer", globalObj.currPlayer);
   });
 
   // Listening for the orbreplacement arr and updating it accordingly
@@ -103,23 +89,22 @@ export const init = (globalObj, domElements, canvasObj) => {
   // Listening for the playerReplacement event, and then displaying it
   // as a flash message
   clientSocket.on("playerReplacement", (msg) => {
-    console.log(msg);
+    domElements.messageSpan.style.opacity = 1;
+    domElements.messageSpan.textContent = msg;
+
+    setTimeout(() => {
+      domElements.messageSpan.style.opacity = 0;
+    }, 5000);
   });
 
   // Listening for the got killed message
   clientSocket.on("gotKilled", (msg) => {
     domElements.messageSpan.style.opacity = 1;
-    domElements.messageScore.style.opacity = 1;
-    domElements.messageSpan.textContent = msg.msg;
-    domElements.messageScore.textContent = msg.score;
+    domElements.messageSpan.textContent = msg;
+
     setTimeout(() => {
       domElements.messageSpan.style.opacity = 0;
-      domElements.messageScore.style.opacity = 0;
-      domElements.retryButton.style.opacity = 1;
     }, 5000);
-    domElements.retryButton.addEventListener("click", () => {
-      window.location.reload();
-    });
   });
 
   // Listening for the  killed message
@@ -128,13 +113,20 @@ export const init = (globalObj, domElements, canvasObj) => {
     domElements.messageSpan.textContent = msg;
     setTimeout(() => {
       domElements.messageSpan.style.opacity = 0;
+      domElements.retryButton.style.opacity = 1;
     }, 3000);
+    retryButton.addEventListener("click", (event) => {
+      window.location("/");
+    });
   });
 
   // Listening for the updateLeaderboard event, and update the scores
   // accordingly
   clientSocket.on("updateLeaderboard", (newLeaderboard) => {
+    console.log("leaderboard update event");
+    // Updating the leaderboard
     globalObj.leaderboard = newLeaderboard;
+    domElements.leaderboardList.value = newLeaderboard;
     console.log(globalObj.leaderboard);
   });
 
@@ -144,6 +136,6 @@ export const init = (globalObj, domElements, canvasObj) => {
     domElements.messageSpan.textContent = msg;
     setTimeout(() => {
       domElements.messageSpan.style.opacity = 0;
-    }, 3000);
+    }, 5000);
   });
 };

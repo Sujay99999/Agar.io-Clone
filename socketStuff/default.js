@@ -9,6 +9,7 @@ const io = require("./../server.js").io;
 const Orb = require("./classes/Orb.js");
 const AppError = require("./../expressStuff/utils/AppError");
 const authController = require("./../expressStuff/controllers/authController");
+const User = require("./../expressStuff/models/userModel");
 
 const checkForOrbCollisions = require("./checkCollisions.js")
   .checkForOrbCollisions;
@@ -33,7 +34,7 @@ const settings = {
   defaultOrbs: 100,
   canvasWidth: 500,
   canvasHeight: 500,
-  tickTime: 100,
+  tickTime: 500,
 };
 
 // This function is called, when the server is initialized
@@ -65,6 +66,15 @@ module.exports.initSocketListners = async () => {
       ) {
         // If the user is not able to authenticate himself, atleast he can play the basic version, by taking the
         // name from the query string
+
+        // Make sure that there are no 2 anonymous persons with the same name
+        const doubleRolePlayer = players.find((player) => {
+          return player.name === socket.handshake.query.name;
+        });
+        if (doubleRolePlayer) {
+          console.log("Please take another user name");
+          return next(new AppError("Please take another user name", 401));
+        }
 
         // 2) Query parameter if present
         // Or else, return a error
@@ -116,16 +126,20 @@ module.exports.initSocketListners = async () => {
   });
   io.of("/game").on("connection", (socket) => {
     // console.log(io);
+    if (!socket.connected) {
+      socket.emit(
+        "generalMessage",
+        "Sorry.. Unable to connect to server. Please try again."
+      );
+      socket.disconnect(true);
+    }
+
     console.log("the socket is connected", socket.id);
     console.log("the socket name is " + socket.user.name);
     // Even though the client gets connected to server, there is a initial round of message exchange
 
     // This player object contains the details of the cooresponding socket that is connected
     let connectedPlayerTotalInfo = {};
-
-    // For future purposes, all the connected clinet are added to the
-    // game room of the default namespace
-    socket.join("room");
 
     // The server then listens to the init event, to actually start the game
     // and ONLY send some data back to the client
@@ -153,19 +167,15 @@ module.exports.initSocketListners = async () => {
       // console.log("player data on server is", players);
       setInterval(function () {
         // console.log("player data that is sent to client");
-        io.of("/game").to("room").emit("tock", players);
+        io.of("/game").emit("tock", players);
       }, settings.tickTime);
 
       // This listener captures the new vector of the particular player
       // and updates the coordinates respectively
       socket.on("tick", (data) => {
-        // console.log("tick data");
         // The data contains the player's new vector position, and here, wee need to
         // update the players coordinates
-
         // Because of the speed the js is not able to remove the previous circle
-        // console.log(connectedPlayerTotalInfo);
-        // console.log("name is " + connectedPlayerTotalInfo.playerInfo.name);
         const speed = connectedPlayerTotalInfo.playerOtherInfo.speed;
 
         // Updating the xvectorand the yvector of the player
@@ -229,12 +239,9 @@ module.exports.initSocketListners = async () => {
         );
         orbPlayerCollisionPromise
           .then((consumedOrbIndex) => {
-            // console.log("there is a orb collision");
-            // console.log(consumedOrbIndex);
-
             // When there is actually a collision with an orb, we need to update the
-            // orbArr and also the updated arr to all the clients
-            io.of("/game").to("room").emit("orbReplacement", {
+            // orbArr and also send the updated arr to all the clients
+            io.of("/game").emit("orbReplacement", {
               consumedOrbIndex,
               orbArr,
             });
@@ -242,25 +249,24 @@ module.exports.initSocketListners = async () => {
             // Its not necessary to update the leaderboard every frame, instead, we can
             // just update it when the player's stats are changed. i.e when orb is
             // consumed
-            io.of("/game")
-              .to("room")
-              .emit(
-                "updateLeaderboard",
-                // It's an array of scores of all the players
-                players
-                  .map((playerInfo) => {
-                    return {
-                      name: playerInfo.name,
-                      score: playerInfo.score,
-                    };
-                  })
-                  .sort((a, b) => {
-                    return b.score > a.score;
-                  })
-              );
+            io.of("/game").emit(
+              "updateLeaderboard",
+              // It's an array of scores of all the players
+              players
+                .map((playerInfo) => {
+                  console.log("update leaderboard event emitted");
+                  return {
+                    name: playerInfo.name,
+                    score: playerInfo.score,
+                  };
+                })
+                .sort((a, b) => {
+                  return b.score > a.score;
+                })
+            );
           })
           .catch((err) => {
-            // console.error(err);
+            console.error(err);
           });
 
         // Collision for PLAYER and PLAYER
@@ -270,33 +276,57 @@ module.exports.initSocketListners = async () => {
           players
         );
         playerPlayerCollisionPromise
-          .then((updatedScores) => {
+          .then(async (updatedScores) => {
             // NOTE: This function is only called by the killer socket
             console.log("there is a player-player collsion");
 
             // Firstly, findout the died socket and remove him from the room
-            const diedSocket = io
-              .of("/game")
-              .sockets.sockets.get(updatedScores.died.socketId);
+            const allSockets = await io.of("/game").fetchSockets();
+            const diedSocket = allSockets.find(
+              (socket) => socket.id === updatedScores.died.socketId
+            );
+            console.log(diedSocket.id, "i have died");
 
             // And also send a message to the killed player, that he is terminated
             // and the socket is also removed from the room.
-            diedSocket.emit("gotKilled", {
-              msg: `Sorry, buddy, you have been killed by ${updatedScores.killedBy.name}`,
-              score: updatedScores.killedBy.score,
-            });
-            diedSocket.leave("room");
+            diedSocket.emit(
+              "gotKilled",
+              `Sorry, buddy, you have been killed by ${updatedScores.killedBy.name}. Your final score is ${updatedScores.died.score}`
+            );
+
+            // if the user is a authenticated one, update his score
+            console.log(diedSocket.user);
+            if (diedSocket.user._id !== "anonymous") {
+              // const fuvkUser = await User.findById(
+              //   diedSocket.user._id
+              // );
+              // console.log("the fuvkUser user is", fuvkUser);
+              const updatedUser = await User.findOneAndUpdate(
+                {
+                  _id: diedSocket.user._id,
+                  highestScore: { $lt: updatedScores.died.score },
+                },
+                {
+                  highestScore: updatedScores.died.score,
+                },
+                {
+                  new: true,
+                }
+              );
+              console.log("the updated user is", updatedUser);
+            }
+
+            setTimeout(function () {
+              diedSocket.disconnect(true);
+            }, 4000);
 
             // In case of collision between player and player, we must send a message
             // to all connected players except the killed player,
             // that the player has been terminated.
-            socket
-              .of("/game")
-              .to("room")
-              .emit(
-                "playerReplacement",
-                `Player ${updatedScores.died.name} is killed by ${updatedScores.killedBy.name}`
-              );
+            socket.broadcast.emit(
+              "playerReplacement",
+              `Player ${updatedScores.died.name} is killed by ${updatedScores.killedBy.name}`
+            );
 
             // We can also send a congratulations message to the killer
             socket.emit(
@@ -307,32 +337,33 @@ module.exports.initSocketListners = async () => {
             // Its not necessary to update the leaderboard every frame, instead, we can
             // just update it when the player's stats are changed. i.e when orb is
             // consumed
-            io.of("/game")
-              .to("room")
-              .emit(
-                "updateLeaderboard",
-                // It's an array of scores of all the players
-                players
-                  .map((playerInfo) => {
-                    return {
-                      name: playerInfo.name,
-                      score: playerInfo.score,
-                    };
-                  })
-                  .sort((a, b) => {
-                    return b.score > a.score;
-                  })
-              );
+            io.of("/game").emit(
+              "updateLeaderboard",
+              // It's an array of scores of all the players
+              players
+                .map((playerInfo) => {
+                  return {
+                    name: playerInfo.name,
+                    score: playerInfo.score,
+                  };
+                })
+                .sort((a, b) => {
+                  return b.score > a.score;
+                })
+            );
           })
           .catch((err) => {
             console.error(err);
           });
       });
 
-      // Listen for the disconnecting event
-      socket.on("disconnect", (reason) => {
-        console.log("Dissconnected", socket.user.name);
-        socket.leave("room");
+      // Listen for the disconnecting event. it catches the events from the cline as well as the browser
+      socket.on("disconnect", async (reason) => {
+        console.log(
+          "Dissconnected........................................",
+          socket.user
+        );
+        socket.disconnect();
 
         const disconnectedSocket = players.find((playerEl) => {
           return playerEl.socketId === socket.id;
@@ -348,12 +379,10 @@ module.exports.initSocketListners = async () => {
         players.splice(disconnectedSocketIndex, 1);
         // console.log("after slicing", players);
         // Emit an message to all the connected players
-        io.of("/game")
-          .to("room")
-          .emit(
-            "generalMessage",
-            `The player ${disconnectedSocket.name} has been disconnected, ${reason}`
-          );
+        io.of("/game").emit(
+          "generalMessage",
+          `The player ${disconnectedSocket.name} has been disconnected, ${reason}`
+        );
       });
     });
   });

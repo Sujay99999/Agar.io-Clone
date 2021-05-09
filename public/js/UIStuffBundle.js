@@ -9116,19 +9116,9 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 console.log("socketstuff loaded"); // imports
 
 // Getting the io variable
-console.log("".concat(location.protocol, "//").concat(location.host));
+console.log(location.href);
 var clientSocket = (0, _socket.io)(location.href);
-console.log("clientsocket is", clientSocket); // const getCookies = function () {
-//   var pairs = document.cookie.split(";");
-//   var cookies = {};
-//   for (var i = 0; i < pairs.length; i++) {
-//     var pair = pairs[i].split("=");
-//     cookies[(pair[0] + "").trim()] = unescape(pair.slice(1).join("="));
-//   }
-//   return cookies;
-// };
-// console.log(getCookies());
-// When the user actually starts the game, he calls the function init()
+console.log("clientsocket is", clientSocket); // When the user actually starts the game, he calls the function init()
 
 var init = function init(globalObj, domElements, canvasObj) {
   // The draw is an recursive fn that starts drwaing the canvas
@@ -9140,11 +9130,14 @@ var init = function init(globalObj, domElements, canvasObj) {
   });
   clientSocket.on("disconnect", function (reason) {
     console.log("disconnect handler", reason);
+    domElements.messageSpan.style.opacity = 1;
+    domElements.messageSpan.textContent = "Got Disconnected ".concat(reason, ". Please try again.");
     setTimeout(function () {
+      domElements.retryButton.style.opacity = 1;
       domElements.retryButton.addEventListener("click", function () {
         window.location.reload();
       });
-    }, 3000);
+    }, 4000);
   }); // The init event marks the actual start of the game and starts
   // change of messages to the server
 
@@ -9162,23 +9155,20 @@ var init = function init(globalObj, domElements, canvasObj) {
     globalObj.currPlayer.name = msg.userName;
     globalObj.orbArr = msg.orbArr;
     setTimeout(function () {
-      console.log("started transmitting data to the server");
+      // console.log("started transmitting data to the server");
       setInterval(function () {
-        console.log("data is sent to the server", globalObj.currPlayer.xVector, globalObj.currPlayer.yVector);
         clientSocket.emit("tick", {
           id: clientSocket.id,
           xVector: globalObj.currPlayer.xVector,
           yVector: globalObj.currPlayer.yVector
         });
-      }, 100);
+      }, 500);
     }, 1000);
   }); // The socket must also listen to the tock function, that contains
   // the newly fetched coordinates of the items in canvas
 
   clientSocket.on("tock", function (tockData) {
-    console.log("data recieved from the server");
-    globalObj.allPlayers = tockData; // console.log("allPLayers", globalObj.allPlayers);
-
+    globalObj.allPlayers = tockData;
     var tempPlayer = globalObj.allPlayers.find(function (playerEl) {
       return playerEl.socketId === clientSocket.id;
     }); // In the case, where the player is either terminated or disconnected, we must
@@ -9191,8 +9181,7 @@ var init = function init(globalObj, domElements, canvasObj) {
 
     globalObj.currPlayer.locX = tempPlayer.locX;
     globalObj.currPlayer.locY = tempPlayer.locY;
-    globalObj.currPlayer.score = tempPlayer.score;
-    console.log("currplayer", globalObj.currPlayer);
+    globalObj.currPlayer.score = tempPlayer.score; // console.log("currplayer", globalObj.currPlayer);
   }); // Listening for the orbreplacement arr and updating it accordingly
 
   clientSocket.on("orbReplacement", function (data) {
@@ -9201,22 +9190,19 @@ var init = function init(globalObj, domElements, canvasObj) {
   // as a flash message
 
   clientSocket.on("playerReplacement", function (msg) {
-    console.log(msg);
+    domElements.messageSpan.style.opacity = 1;
+    domElements.messageSpan.textContent = msg;
+    setTimeout(function () {
+      domElements.messageSpan.style.opacity = 0;
+    }, 5000);
   }); // Listening for the got killed message
 
   clientSocket.on("gotKilled", function (msg) {
     domElements.messageSpan.style.opacity = 1;
-    domElements.messageScore.style.opacity = 1;
-    domElements.messageSpan.textContent = msg.msg;
-    domElements.messageScore.textContent = msg.score;
+    domElements.messageSpan.textContent = msg;
     setTimeout(function () {
       domElements.messageSpan.style.opacity = 0;
-      domElements.messageScore.style.opacity = 0;
-      domElements.retryButton.style.opacity = 1;
     }, 5000);
-    domElements.retryButton.addEventListener("click", function () {
-      window.location.reload();
-    });
   }); // Listening for the  killed message
 
   clientSocket.on("killed", function (msg) {
@@ -9224,12 +9210,19 @@ var init = function init(globalObj, domElements, canvasObj) {
     domElements.messageSpan.textContent = msg;
     setTimeout(function () {
       domElements.messageSpan.style.opacity = 0;
+      domElements.retryButton.style.opacity = 1;
     }, 3000);
+    retryButton.addEventListener("click", function (event) {
+      window.location("/");
+    });
   }); // Listening for the updateLeaderboard event, and update the scores
   // accordingly
 
   clientSocket.on("updateLeaderboard", function (newLeaderboard) {
+    console.log("leaderboard update event"); // Updating the leaderboard
+
     globalObj.leaderboard = newLeaderboard;
+    domElements.leaderboardList.value = newLeaderboard;
     console.log(globalObj.leaderboard);
   }); // Listening for the general event, where we display the message
 
@@ -9238,7 +9231,7 @@ var init = function init(globalObj, domElements, canvasObj) {
     domElements.messageSpan.textContent = msg;
     setTimeout(function () {
       domElements.messageSpan.style.opacity = 0;
-    }, 3000);
+    }, 5000);
   });
 };
 
@@ -9333,7 +9326,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52912" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52603" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

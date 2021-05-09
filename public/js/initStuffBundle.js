@@ -14085,34 +14085,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 console.log("initStuff loaded"); // Other modules
 
 // DOM elements
-// const basicForm = document.getElementById("login-form-basic");
 var anonymousForm = document.getElementById("login-form-anonymous");
-var googleBtn = document.getElementById("login-btn-google"); //const basicFormBtn = document.getElementById("login-form-basic-button");
-
-var anonymousFormBtn = document.getElementById("login-form-anonymous-button"); //const basicFormEmail = document.getElementById("login-form-basic-email");
-//const basicFormPassword = document.getElementById("login-form-basic-password");
-
+var googleBtn = document.getElementById("login-btn-google");
+var anonymousFormBtn = document.getElementById("login-form-anonymous-button");
 var anonymousFormName = document.getElementById("login-form-anonymous-name"); // auth using google
 // 1) directly hit the google route
 
 googleBtn.addEventListener("click", function (event) {
   window.location.assign("/auth/google");
-}); // auth using form
-// 1) Get the details from the form and redirect to the game page
-// basicForm.addEventListener("submit", async (event) => {
-//   event.preventDefault();
-//   const email = basicFormEmail.value;
-//   const password = basicFormPassword.value;
-//   const response = await axios({
-//     method: "post",
-//     url: "/game",
-//     data: {
-//       email: email,
-//       password: password,
-//     },
-//   });
-// });
-// auth anonymously
+}); // auth anonymously
 // 1) Get the name form the form. and and hit the /login-anonymous
 
 anonymousForm.addEventListener("submit", /*#__PURE__*/function () {
@@ -14122,12 +14103,13 @@ anonymousForm.addEventListener("submit", /*#__PURE__*/function () {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
+            console.log(event);
             event.preventDefault();
             name = anonymousFormName.value;
             console.log(name);
             window.location.assign("".concat(location.href, "game?name=").concat(name));
 
-          case 4:
+          case 5:
           case "end":
             return _context.stop();
         }
@@ -14167,7 +14149,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57526" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65016" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

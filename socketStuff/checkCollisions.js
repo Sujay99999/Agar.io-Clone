@@ -86,6 +86,7 @@ const checkForPlayerCollisions = (pInfo, pOtherInfo, players) => {
       }
     });
     reject("no collision between players");
+    // reject();
   });
 };
 
