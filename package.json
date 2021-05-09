@@ -7,8 +7,9 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "parcel-watch-1": "parcel watch ./public/js/initStuff.js --out-dir ./public/js --out-file initStuffBundle.js",
+    "parcel-build-1": "parcel build ./public/js/initStuff.js --out-dir ./public/js --out-file initStuffBundle.js",
     "parcel-watch-2": "parcel watch ./public/js/UIStuff.js --out-dir ./public/js --out-file UIStuffBundle.js",
-    "watch:js": "concurrently \"npm run parcel-watch-1\" && \"npm run parcel-watch-2\"",
+    "parcel-build-2": "parcel build ./public/js/UIStuff.js --out-dir ./public/js --out-file UIStuffBundle.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sujay Jami",

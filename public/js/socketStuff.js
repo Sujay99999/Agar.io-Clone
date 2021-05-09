@@ -56,7 +56,7 @@ export const init = (globalObj, domElements, canvasObj) => {
           xVector: globalObj.currPlayer.xVector,
           yVector: globalObj.currPlayer.yVector,
         });
-      }, 500);
+      }, 100);
     }, 1000);
   });
 

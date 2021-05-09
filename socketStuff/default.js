@@ -34,7 +34,7 @@ const settings = {
   defaultOrbs: 100,
   canvasWidth: 500,
   canvasHeight: 500,
-  tickTime: 500,
+  tickTime: 100,
 };
 
 // This function is called, when the server is initialized

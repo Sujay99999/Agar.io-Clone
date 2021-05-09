@@ -9162,7 +9162,7 @@ var init = function init(globalObj, domElements, canvasObj) {
           xVector: globalObj.currPlayer.xVector,
           yVector: globalObj.currPlayer.yVector
         });
-      }, 500);
+      }, 100);
     }, 1000);
   }); // The socket must also listen to the tock function, that contains
   // the newly fetched coordinates of the items in canvas
