@@ -32,8 +32,8 @@ const settings = {
   defaultSpeed: 15,
   defaultZoom: 10,
   defaultOrbs: 100,
-  canvasWidth: 500,
-  canvasHeight: 500,
+  canvasWidth: 5000,
+  canvasHeight: 5000,
   tickTime: 100,
 };
 
